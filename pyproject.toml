@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xhpi"
+version = "1.0.0"
+description = "XH-pi interactions detector in protein structures."
+requires-python = ">=3.9"
+dependencies = [
+    "gemmi",
+    "pandas",
+    "tqdm",
+    "numpy"
+]
+
+[project.scripts]
+xhpi = "xhpi.cli:main"

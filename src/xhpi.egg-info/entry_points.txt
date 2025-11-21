@@ -1,0 +1,2 @@
+[console_scripts]
+xhpi = xhpi.cli:main
