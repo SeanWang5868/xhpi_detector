@@ -1,108 +1,55 @@
-\documentclass[a4paper,11pt]{article}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{geometry}
-\usepackage{listings}
-\usepackage{xcolor}
-\usepackage{hyperref}
-\usepackage{booktabs}
-\usepackage{amsmath}
+# XH-$\pi$ Interaction Detector
 
-% Page Setup
-\geometry{margin=1in}
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{0.5em}
+**xhpi** is designed for detection of XH-$\pi$ interactions in protein structures (PDB/mmCIF). It features automated hydrogen addition and geometric validation based on Hudson/Plevin criteria
 
-% Code Style
-\definecolor{codegray}{gray}{0.9}
-\lstset{
-    backgroundcolor=\color{codegray},
-    basicstyle=\ttfamily\small,
-    breaklines=true,
-    frame=single,
-    framerule=0pt,
-    framesep=5pt,
-    columns=fullflexible
-}
 
-\title{\textbf{XH-pi}: XH-pi interactions detector}
-\author{}
-\date{}
+## Installation
 
-\begin{document}
+Requires Python $\ge$ 3.9.
 
-\maketitle
-
-\section*{Introduction}
-\textbf{XH-pi} is a high-performance CLI tool designed for the automated detection of XH--$\pi$ interactions in protein structures (PDB/CIF). It features an integrated topology preparation pipeline (using Gemmi), supports recursive directory scanning, and utilizes efficient geometric algorithms based on \textit{Hudson} and \textit{Plevin} criteria.
-
-\section*{Features}
-\begin{itemize}
-    \item \textbf{Automated Hydrogen Addition}: In-memory topology preparation via Gemmi.
-    \item \textbf{High Performance}: Parallel processing with multi-core support.
-    \item \textbf{Flexible Input}: Handles single files or recursive directory scans.
-    \item \textbf{Dual Criteria}: Supports both Hudson and Plevin geometric definitions.
-    \item \textbf{Industrial Output}: JSON (default) or CSV formats; customizable output directories.
-\end{itemize}
-
-\section*{Installation}
-Ensure you have Python 3.9+ installed.
-
-\begin{lstlisting}[language=bash]
-git clone https://github.com/yourusername/xhpi.git
+```bash
+# 1. Clone the repository
+git clone [https://github.com/SeanWang5868/xhpi_detector](https://github.com/SeanWang5868/xhpi_detector)
 cd xhpi
 pip install .
-\end{lstlisting}
+```
 
-\section*{Quick Start}
+## Configuration
 
-\subsection*{1. Configure Environment (Optional)}
-Set the default path to your Monomer Library (e.g., CCP4 monomers) for permanent usage.
-\begin{lstlisting}[language=bash]
-xhpi --set-mon-lib /path/to/monomers/
-\end{lstlisting}
+The detection of xh $/pi$ interactions depends on the position of H atoms in the protein structure. In order to add H to the structure to be detected, the path to the monomer library (such as the CCP4 monomer library) needs to be specified first.
 
-\subsection*{2. Run Analysis}
-Process all \texttt{.cif} files in a directory recursively and save results to JSON.
-\begin{lstlisting}[language=bash]
-xhpi ./data_directory
-\end{lstlisting}
+```bash
+xhpi --set-mon-lib /path/to/ccp4/monomers
+```
 
-\subsection*{3. Advanced Usage}
-Process specific files, use 8 cores, apply "Remove & Re-add" hydrogen mode, and export as CSV.
-\begin{lstlisting}[language=bash]
-xhpi ./data/*.cif --jobs 8 --h-mode 3 --file-type csv --out-dir ./results
-\end{lstlisting}
+## Usage
 
-\section*{Parameters}
+### Basic Analysis
+Recursively scan a directory for `.cif` files and output JSON results to the same directory.
 
-\begin{table}[h]
-\centering
-\begin{tabular}{@{}ll@{}}
-\toprule
-\textbf{Option} & \textbf{Description} \\ \midrule
-\texttt{<PATH>} & Input files (.cif) or directories to scan recursively. \\
-\texttt{--set-mon-lib <DIR>} & Set the default Monomer Library path permanently. \\
-\texttt{--mon-lib <DIR>} & Override the library path for the current run. \\
-\texttt{--out-dir <DIR>} & Specify a central directory for output files. \\
-\texttt{--file-type <STR>} & Output format: \texttt{json} (default) or \texttt{csv}. \\
-\texttt{--jobs <NUM>} & Number of parallel CPU cores (Default: 1). \\
-\texttt{--h-mode <NUM>} & Hydrogen handling strategy (see below). \\ \bottomrule
-\end{tabular}
-\end{table}
+```bash
+xhpi ./pdb_data/
+```
 
-\subsection*{Hydrogen Modes (--h-mode)}
-Default is \textbf{4}.
-\begin{itemize}
-    \item \texttt{0}: NoChange (Keep existing H)
-    \item \texttt{1}: Shift (Move H to standard positions)
-    \item \texttt{2}: Remove (Remove all H)
-    \item \texttt{3}: ReAdd (Remove and re-add all)
-    \item \texttt{4}: ReAddButWater (Re-add all except water)
-    \item \texttt{5}: ReAddKnown (Only for known residues)
-\end{itemize}
+## Detection Logic
 
-\section*{License}
-MIT License.
+The tool classifies interactions based on two distinct geometric systems:
 
-\end{document}
+### 1. Plevin System
+* **Distance ($d$)**: $< 4.3 \text{\AA}$
+* **Angle ($XH\dots\pi$)**: $> 120^\circ$
+* **Angle ($XPCN$)**: $< 25^\circ$
+
+### 2. Hudson System
+* **Distance ($d$)**: $\le 4.5 \text{\AA}$
+* **Angle ($\theta_{norm}$)**: $\le 40^\circ$
+* **Distance ($d_{proj}$)**: 
+    * $\le 1.6 \text{\AA}$ for **HIS** and **TrpA**.
+    * $\le 2.0 \text{\AA}$ for **TRP**, **TYR**, **PHE**.
+
+## Contact
+sean.wang@york.ac.uk
+
+York Structural Biology Laboratory (YSBL)
+Department of Chemistry, University of York
+Heslington, York, YO10 5DD, UK
